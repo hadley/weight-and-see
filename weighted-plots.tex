@@ -1,0 +1,116 @@
+\providecommand{\setflag}{\newif \ifwhole \wholefalse}
+\setflag
+\ifwhole\else
+\documentclass[oneside,letterpaper]{scrartcl}
+\usepackage{fullpage}
+%\documentclass[openright]{scrbook}
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{hyperref}
+
+\title{Graphical displays of weighted data}
+\author{Hadley Wickham, Heike Hofmann, Antony Unwin}
+
+\begin{document}
+
+\section{Weighting}\label{sec:introduction}
+
+The most straightforward example of weighted data is aggregated data, where all observations with the same values are stored as an aggregate with an additional column representing the number of observations in that category.  This is only useful with purely categorical data as the probability of two observations having the same value of a continuous variable is very small (0 if truly continuous, but only ever have a finite precision).  Many large data sets, for example census data, bin continuous data into categorical data to allow for aggregation.  Weights in these cases will be whole numbers and are called frequency weights.
+
+Weighted data can also come from certain survey designs, where sampling probabilities are used to generate more precise estimates.  These weights will be probabilities: each individual weight between zero and one, and all weights sum to one.  These are probability weights.
+
+Probability and frequency weights are equivalent, just expressed on different scales. 
+
+Weights can also come from some types of analyses of experimental data.  For example, in a multistage analysis, we might have a summary data set that includes summary statistics and a measure of uncertainty, e.g. a standard deviation.
+
+If data is aggregated on the basis of some other data set,  For example, census data aggregated by county, there may be other variables that it makes sense to weight by.  For example, you may want to weight by county population, or county area, or population density depending on what questions you are interested in.
+
+Another example occurs with longitudinal data.  If you are interested in analysing relative differences between time points, it is often useful to weight by the initial (or final) numbers so that small values (which may have larger relative oscillations) don't bias the results of the regression.
+
+(Are there any other types of weighted data?  Which ones should we emphasise? Which ones do you have good examples for?)
+
+In all cases we will assume that weights are strictly positive (any observation with weight 0 can simply be omitted) and linear (a weight of 2 is equivalent to 2 observations of weight 1).
+
+\section{Weighted plots}\label{sec:weighted_plots}
+
+Statistical techniques to deal with weighted data are well developed, and generally require fairly simple extensions to prior theory (for example extension of least squares to weighted least squares).  Extending graphical displays to deal with weighted data is generally straightforward as well, but has not previous been presented in its entirety.  In this paper we will discuss how many standard plots can be extended to deal with weighted data in an appropriate manner.  
+
+The plots we describe in this paper are available for use.  All the static weighted plots in this paper have been (will be!) implemented in the R package {\tt ggplot}.  The interactive area plots are implemented in Manet and Mondrian.
+
+\section{Area plots}\label{sec:area_plots}
+
+Area plots, in which area is used to represent the value of a variable, extend naturally to weighted data...
+
+Sum weights instead of counting observations (equivalent in the case of unit weights.)
+
+\subsection{Mosaic plots}\label{sub:mosaic_plots}
+
+\subsection{Histogram}\label{sub:histogram}
+
+Is an area based plot for continuous data.  It converts continuous data into categorical by binning.  
+ 
+Counts vs. densities (frequency vs. probability weighting)
+
+What does a weighted histogram mean? 
+
+Quick note about choice of bin width and starting point and desirability of exploring these interactively.  (Or at least using using a set of defaults that highlight different features of the data).  Certain bin widths and starting points will be suggested naturally from the data.
+
+\subsection{Fluctuation diagrams}\label{sub:fluctuation_diagrams}
+
+
+\section{Density plots}\label{sec:density_estimation}
+
+Density estimation is the continuous analog of the histogram.  Instead of discretizing the data and looking at counts at a finite set of points, we ...
+
+Formula for a density estimate
+Add weights to formula.
+Write histogram in this form.
+
+Connection between average shifted histogram and density plots (uniform density with range equal to bin width of histogram?)
+
+Choice of bandwidth - just like the just like the choice of bin width and starting point need to be varied to get the full story from the data, so to should the bandwidth of the smoother.  Don't  need to  Experimentation with different density functions is likely to be largely fruitless.
+
+Counts vs densities - density plots typically show densities, but we can adjust them to show counts through a simple scaling of the y-axis.  
+
+Why use a density plot instead of a histogram?
+
+Interactive considerations - what does selection on a density plot mean.
+
+\section{Scatterplots}\label{sec:scatterplots}
+ 
+Modify point aesthetics: size (area, not radius), or opacity.  With large numbers of points, all techniques basically equivalent to 2d density estimation.  
+
+Can do the counting or density estimation explicitly.  
+
+\begin{itemize}
+  \item explicit 2d density estimation: just add weights
+  \item binned plots (eg. hexagon plots): work just like area plots in the categorical case, need to sum weights instead of counting
+\end{itemize}
+
+\section{Statistical plots}\label{sec:statistical_plots}
+
+(need a better name for this section - I am talking about plots that display summaries from statistical transformations)
+
+In this section, we discuss the odds and sods of statistical graphics.  These have no underlying theme except that they display statistical reductions of the data using simpler graphical objects.  For example, smoothes reduce data to a single line.
+
+\subsection{Boxplots}\label{sub:boxplots}
+
+Use weighted quantiles.
+
+Weighted quantiles are calculated by...
+
+\subsection{Smoothers}\label{sub:smoothers}
+
+A smoother supplements a plot with the output of a statistical model.  In particular, adds a line represents the results of some local estimate of the mean.  Many different types of smoothers: loess, linear model, linear model with splines, generalised additive model...
+
+Smoothers can be weighted in a very straightforward manner - simply by passing the appropriate weights to the underlying statistical algorithm.
+
+\subsection{Quantile regression}\label{sub:quantile_regression}
+
+Most of the smoothers we are familiar with display the mean of the data.  What if we want to show other measures of centrality or spread?  Quantile regression gives us the ability to show the smoothed pattern of any quantile of our data.
+
+Quantile regression is similar in spirit to the 2d density estimation discussed above, but it displays density of points conditional on the x-values.  Quantile regression is to 2d density estimation what the boxplot is to the 2d histogram.
+
+(Have I missed any plots?)
+
+\end{document}
