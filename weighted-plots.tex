@@ -31,6 +31,12 @@ Another example occurs with longitudinal data.  If you are interested in analysi
 
 In all cases we will assume that weights are strictly positive (any observation with weight 0 can simply be omitted) and linear (a weight of 2 is equivalent to 2 observations of weight 1).
 
+Further examples of weighting include weighted time series, such as
+share prices and volumes of trades, weighting for non-response, and
+the weighted cellsize histogram in MANET.  Then what about the
+weights used in rankings, with weighting as an importance measure
+(e.g. best university, best hospital)?
+
 \section{Weighted plots}\label{sec:weighted_plots}
 
 Statistical techniques to deal with weighted data are well developed, and generally require fairly simple extensions to prior theory (for example extension of least squares to weighted least squares).  Extending graphical displays to deal with weighted data is generally straightforward as well, but has not previous been presented in its entirety.  In this paper we will discuss how many standard plots can be extended to deal with weighted data in an appropriate manner.  
@@ -54,6 +60,10 @@ Counts vs. densities (frequency vs. probability weighting)
 What does a weighted histogram mean? 
 
 Quick note about choice of bin width and starting point and desirability of exploring these interactively.  (Or at least using using a set of defaults that highlight different features of the data).  Certain bin widths and starting points will be suggested naturally from the data.
+
+\subsection{Self weighted histograms}\label{sub:self_weighted_histograms} % (fold)
+
+% subsection (end)
 
 \subsection{Fluctuation diagrams}\label{sub:fluctuation_diagrams}
 
@@ -93,6 +103,8 @@ Can do the counting or density estimation explicitly.
 
 In this section, we discuss the odds and sods of statistical graphics.  These have no underlying theme except that they display statistical reductions of the data using simpler graphical objects.  For example, smoothes reduce data to a single line.
 
+Residual plots from weighted data.
+
 \subsection{Boxplots}\label{sub:boxplots}
 
 Use weighted quantiles.
@@ -112,5 +124,12 @@ Most of the smoothers we are familiar with display the mean of the data.  What i
 Quantile regression is similar in spirit to the 2d density estimation discussed above, but it displays density of points conditional on the x-values.  Quantile regression is to 2d density estimation what the boxplot is to the 2d histogram.
 
 (Have I missed any plots?)
+
+\subsection{Interaction}\label{sub:interaction} % (fold)
+
+Interacting with plots of the same data weighted by difference variables.
+
+
+% subsection (end)
 
 \end{document}
