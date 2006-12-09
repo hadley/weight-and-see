@@ -15,31 +15,50 @@
 
 \section{Weighting}\label{sec:introduction}
 
+Conditions on weights:
+
+\begin{itemize}
+  \item Non-negative, real numbers
+  \item Additive (implies two points with weight one, equivalent to one point with weight two)
+\end{itemize}
+
+Visual importance should be proportional to statistical importance.
+
+frequency weights 
+- that would fit into our framework by thinking about the difference between the Titanic data set as a listing of individuals or the collapsed version (I told my Stat 557 (categorical data analysis) students this semester, that this was just another way to write a contingency table) The counts in Titanic.wgt would be the frequency weights.
+Datasets with frequency weights could always be "unweighted" by repeating each case appropriately many times.
+
+sampling weights
+- those beasts come in from the survey guys. I can imagine mainly two situations:
+ a particular group of people was oversampled (maybe for a rare disease or condition) and weights have to be introduced to make up for that in order to allow comparisons with the rest of the population
+another situation would be those 1\% or 5\% micro surveys - when a household is selected, all of its members end up in the survey - they then don't necessarily represent the correct percentage of the population, which makes it necessary to adjust their influence by multiplying by 100+x where x is a fairly small number.
+
+analytic weights 
+- each case is weighted by the inverse of its variance, i.e. Poisson counts y_i ~ Po_lambda_i would be weighted by 1/lambda_i (or 1/y_i, as an estimate for it) - this'll even out variability that is introduced by the distribution of the variable itself. In a normal setting the variance would be the same, making the weight unnecessary.
+
+importance weights
+- seem a bit fishy - and as Stata says, they don't have statistical definition. We could claim them for our purpose, though.
+
+Is that distinction enough? - The plots you've been discussing seem to fall into the category of frequency weights with an additional transformation (as for transformations - do we really want to go there?)
+
+
 The most straightforward example of weighted data is aggregated data, where all observations with the same values are stored as an aggregate with an additional column representing the number of observations in that category.  This is only useful with purely categorical data as the probability of two observations having the same value of a continuous variable is very small (0 if truly continuous, but only ever have a finite precision).  Many large data sets, for example census data, bin continuous data into categorical data to allow for aggregation.  Weights in these cases will be whole numbers and are called frequency weights.
 
-Weighted data can also come from certain survey designs, where sampling probabilities are used to generate more precise estimates.  These weights will be probabilities: each individual weight between zero and one, and all weights sum to one.  These are probability weights.
+Weighted data can also come from certain survey designs, where sampling probabilities are used to generate more precise estimates.  These weights will be probabilities: each individual weight between zero and one, and all weights sum to one.  Includes weighting for non-response.  These are probability weights.  Probability and frequency weights are equivalent, just expressed on different scales. 
 
-Probability and frequency weights are equivalent, just expressed on different scales. 
+Weights can also come from some types of analyses of experimental data. For example, in a multistage analysis, we might have a summary data set that includes summary statistics and a measure of uncertainty, e.g. a standard deviation. The less knowledge we have about a point, the larger its weight area. This type of weighting includes using error bars, or other glyphs (eg. boxplot) to summarise the distribution of the error associated with a measurement. To combine these types of weights, I think we use the (weightedd) harmonic mean, 1 / (1/n + 1/m).  For this reason, we will always take the reciprocal of these weights. These are analytic (?) weights.
 
-Weights can also come from some types of analyses of experimental data.  For example, in a multistage analysis, we might have a summary data set that includes summary statistics and a measure of uncertainty, e.g. a standard deviation.
+Antony said: ``Stata supports four kinds of weights, frequency weights, sampling weights, analytic weights, and importance weights.''.
 
-If data is aggregated on the basis of some other data set,  For example, census data aggregated by county, there may be other variables that it makes sense to weight by.  For example, you may want to weight by county population, or county area, or population density depending on what questions you are interested in.
+If data is aggregated on the basis of some other data set,  For example, census data aggregated by county, there may be other variables that it makes sense to weight by.  For example, you may want to weight by county population or area depending on what questions you are interested in.
 
 Another example occurs with longitudinal data.  If you are interested in analysing relative differences between time points, it is often useful to weight by the initial (or final) numbers so that small values (which may have larger relative oscillations) don't bias the results of the regression.
 
-(Are there any other types of weighted data?  Which ones should we emphasise? Which ones do you have good examples for?)
-
-In all cases we will assume that weights are strictly positive (any observation with weight 0 can simply be omitted) and linear (a weight of 2 is equivalent to 2 observations of weight 1).
-
-Further examples of weighting include weighted time series, such as
-share prices and volumes of trades, weighting for non-response, and
-the weighted cellsize histogram in MANET.  Then what about the
-weights used in rankings, with weighting as an importance measure
-(e.g. best university, best hospital)?
-
 \section{Weighted plots}\label{sec:weighted_plots}
 
-Statistical techniques to deal with weighted data are well developed, and generally require fairly simple extensions to prior theory (for example extension of least squares to weighted least squares).  Extending graphical displays to deal with weighted data is generally straightforward as well, but has not previous been presented in its entirety.  In this paper we will discuss how many standard plots can be extended to deal with weighted data in an appropriate manner.  
+Statistical techniques to deal with weighted data are well developed, and generally require fairly simple extensions to prior theory (for example extension of least squares to weighted least squares).  Extending graphical displays to deal with weighted data is generally straightforward as well, but does requires some careful though.  In this paper we will discuss how many standard plots can be extended to deal with weighted data in an appropriate manner.  
+
+The underlying principal we will apply is that visual importance should be proportional to statistical importance. 
 
 The plots we describe in this paper are available for use.  All the static weighted plots in this paper have been (will be!) implemented in the R package {\tt ggplot}.  The interactive area plots are implemented in Manet and Mondrian.
 
@@ -68,7 +87,7 @@ Quick note about choice of bin width and starting point and desirability of expl
 \subsection{Fluctuation diagrams}\label{sub:fluctuation_diagrams}
 
 
-\section{Density plots}\label{sec:density_estimation}
+\subsection{Density plots}\label{sub:density_estimation}
 
 Density estimation is the continuous analog of the histogram.  Instead of discretizing the data and looking at counts at a finite set of points, we ...
 
@@ -87,8 +106,20 @@ Why use a density plot instead of a histogram?
 Interactive considerations - what does selection on a density plot mean.
 
 \section{Scatterplots}\label{sec:scatterplots}
- 
+
+We propose three approaches for incorporating weights into points:
+
+\begin{itemize}
+  \item Alpha-blending.  Draw each point with alpha proportional to weight.
+  \item Density estimation.  Estimate (weighted) density over 2d surface.  Display as tiles, or colour points by the density at that position.
+  \item Conservation of ink.  The amount of ink used for each point should be constant, but points with small weight should be bigger and paler.
+\end{itemize}
+
 Modify point aesthetics: size (area, not radius), or opacity.  With large numbers of points, all techniques basically equivalent to 2d density estimation.  
+
+In a dot-based plot things are different, only because we don't have that natural correspondence of weight to a property of the plot. We could try to claim that in a dot-based plot the weight should be shown by a dot rather than an area. This would favor alpha-blending over the bubble-charts:
+If we're using area to show weights, we need to distinguish between aggregated and non-aggregated weights. 
+If we're using the dot-based approach, we could plot a point w_i many times, if the weight w_i is an integer;  this could be extended to continuous weighting by using alpha blending
 
 Can do the counting or density estimation explicitly.  
 
