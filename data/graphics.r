@@ -28,7 +28,7 @@ qplot(black.percent, data=midwest, geom="histogram", binwidth=1, weight=white.po
 
 florida <- read.table("florida-election.txt", header=T)
 qplot(b00pc, b_change, data=florida, xlab="Percent of vote (2000)", ylab="Change in percent of vote")
-qplot(b00pc, b_change, data=florida, size=population / 1e6, xlab="Percent of vote (2000)", ylab="Change in percent of vote") + scale_size("Population\n(millions)", to=c(1,10))
+qplot(b00pc, b_change, data=florida, size=population / 1e6, xlab="Percent of vote (2000)", ylab="Change in percent of vote") + scale_area("Population\n(millions)", to=c(0.5,10))
 
 # Figure 3 -------------------------
 # histogram of weeks + brushed
