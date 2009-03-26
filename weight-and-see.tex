@@ -1,12 +1,12 @@
-
+% zip -r paper.zip *.pdf *.tex *.bib graphics
 \documentclass{svmult}
-\usepackage{makeidx}
 \usepackage{graphicx}
-\usepackage{picins}
+\DeclareGraphicsExtensions{.png,.pdf}
+\graphicspath{{graphics/}}
+
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage[longnamesfirst]{natbib}
-\makeindex
 
 \begin{document}
 
@@ -51,14 +51,16 @@ F & Y & C & 202\\
 \end{table}
 the barchart should look the same.
 
-\begin{center}
-      \includegraphics[width=8cm]{Berk.pdf}
-      \caption{\label{berk}\em Number of graduate applications to six departments in Berkeley.}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=8cm]{berkeley}
+  \caption{\em Number of graduate applications to six departments in Berkeley.}
+  \label{berk}
+\end{figure}
 
- For software like Excel and R the data have to be in a table with frequency weights.   Some interactive software packages like Data Desk, JMP or ggobi, need the data stored as individual cases.  MANET and Mondrian can handle both by using barcharts for the individual case format and weighted barcharts for the tabular format with frequency weights.
- 
-Weighting leads a shadowy existence in the statistical literature.  Taking account of weighting in estimating means or proportions is technically straightforward.  The problems arise in estimating standard errors and determining distributions.  The survey literature covers this in depth for sampling weights (probability weighting, Section~\ref{pw}). Otherwise weighting only merits minor asides.  For instance, in the fascinating series of articles on representativeness in statistics by Kruskal and Mosteller at the end of the $1970$'s (\cite{kruskal1:1979}, \cite{kruskal2:1979}, \cite{kruskal3:1979} and \cite{kruskal:1980}), weighting and weights are only occasionally mentioned in connection with surveys.  Books on graphics also rarely mention weighted graphics.  There is nothing in older excellent books such as \cite{chambers:1983} or \cite{cleveland:1994}, nor in more recent fine books like \cite{Murrell:2005}, \cite{young:2006} or \cite{cook:2007}.  Even \cite{wilkinson:2005} mentions only bubbleplots and weighted graphs briefly.  \cite{unwin:2006} includes some examples of weighting, but only touches on the theory behind it.
+For software like Excel and R the data have to be in a table with frequency weights. Some interactive software packages like Data Desk, JMP or ggobi, need the data stored as individual cases. MANET and Mondrian can handle both by using barcharts for the individual case format and weighted barcharts for the tabular format with frequency weights.
+
+Weighting leads a shadowy existence in the statistical literature. Taking account of weighting in estimating means or proportions is technically straightforward. The problems arise in estimating standard errors and determining distributions. The survey literature covers this in depth for sampling weights (probability weighting, Section~\ref{pw}). Otherwise weighting only merits minor asides. For instance, in the fascinating series of articles on representativeness in statistics by Kruskal and Mosteller at the end of the $1970$'s (\cite{kruskal1:1979}, \cite{kruskal2:1979}, \cite{kruskal3:1979} and \cite{kruskal:1980}), weighting and weights are only occasionally mentioned in connection with surveys. Books on graphics also rarely mention weighted graphics. There is nothing in older excellent books such as \cite{chambers:1983} or \cite{cleveland:1994}, nor in more recent fine books like \cite{Murrell:2005}, \cite{young:2006} or \cite{cook:2007}. Even \cite{wilkinson:2005} mentions only bubbleplots and weighted graphs briefly. \cite{unwin:2006} includes some examples of weighting, but only touches on the theory behind it.
 
 \section{Two examples}
 \label{exs}
@@ -73,10 +75,15 @@ On the other hand, the sample could have been randomly chosen from families with
 \label{pop}
 A thought-provoking example of the potential of weighted graphics was first given in \cite{unwin:1998a}.  The dataset contained details of the $437$ counties of the five Midwestern states (Illinois, Indiana, Michigan, Ohio, Wisconsin), including the numbers of different races living in each county.  Figure~\ref{blackhists} shows different histograms from this dataset.  The first is an unweighted histogram and shows the distribution of the percentage of blacks living in each county.  It is easily seen that most counties have low percentages of black population, but one county's population is about $40\%$ black.  The second histogram is the same data weighted by county population.  The county with the high percentage of blacks turns out to represent a large proportion of the total population (in fact, it is Wayne County, where Detroit lies).  The third histogram is weighted by the black population.  Clearly this emphasises the counties with higher percentages of blacks more.  This display can be interpreted as showing how many blacks live in counties with those percentages of blacks.  Finally, the fourth histogram is weighted by the white population.  This has an opposite effect to the third one and may be interpreted as showing how many whites live in counties with those percentages of blacks.  As the majority of the population is white everywhere, the second and fourth histograms look quite similar and only differ noticeably for the higher levels of black population.
 
-\begin{center}
-      \includegraphics[width=10cm]{Blackhists2.pdf}
-      \caption{\label{blackhists}\em Histograms of the percentage of blacks in each county (upper left), the blacks percentage weighted by the county population (lower left), weighted by the black population (upper right), weighted by the white population (lower right).}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{perc-black-count}%
+  \includegraphics[width=0.5\linewidth]{perc-black-pop-black}
+  \includegraphics[width=0.5\linewidth]{perc-black-pop}%
+  \includegraphics[width=0.5\linewidth]{perc-black-pop-white}
+  \caption{\em Histograms of the percentage of blacks in each county (upper left), the blacks percentage weighted by the county population (lower left), weighted by the black population (upper right), weighted by the white population (lower right).}
+  \label{blackhists}
+\end{figure}
 
 \section{Graphics and weighting}
 \label{gwts}
@@ -86,10 +93,13 @@ Terminology for area plots is not consistent in the literature.  The terms barpl
 
 Area plots can be extended to incorporate weighting easily (cf. Figures~\ref{berk} and~\ref{blackhists}).  Instead of areas being proportional to the numbers of cases, they are drawn proportional to the sums of the weights of the cases.  This cannot be applied to point plots, where some attribute of the point has to be used.  One solution is to vary the size of the points and to make this proportional to the weight.  Another is to use colour or shape.  Colour has been used in displaying point densities \citep{carr:1987} as has shading \citep{hofmann:2000a} and shape has been suggested for overlapping points in scatterplots (sunflower plots in \cite{cleveland:1984}).  Pointsize is used most frequently (cf. the bubbleplots mentioned in Section~\ref{intro}), but can suffer from overlapping and obscuring of points for even a small number of cases.  It is also difficult to apply weighting for boxplots.  A possible solution is to calculate the necessary statistics as if the weights were frequency weights (cf. Section~\ref{fw}) and to draw outliers with pointsizes proportional to their weights.
 
-\begin{center}
-      \includegraphics[width=10cm]{florbub.pdf}
-      \caption{\label{bubflor}\em The scatterplot on the left shows the percentage change in Bush's vote in the Florida election districts between the Presidential elections of 2000 and 2004 plotted against his percentage share in the election of 2000.  The plot on the right shows the same data with each point represented by a bubble whose area is proportional to the population of the district.}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[height=6cm]{florida}%
+  \includegraphics[height=6cm]{florida-weighted}
+  \caption{\em The scatterplot on the left shows the percentage change in Bush's vote in the Florida election districts between the Presidential elections of 2000 and 2004 plotted against his percentage share in the election of 2000.  The plot on the right shows the same data with each point represented by a bubble whose area is proportional to the population of the district.}
+  \label{bubflor}
+\end{figure}
       
 As always with graphics, rules are not hard and fast.  Some bubbleplots can be very informative.  The scatterplot on the left of Figure~\ref{bubflor} suggests that Bush's vote in 2004 increased more the bigger his vote share in the election of 2000.  The scatterplot on the right suggests, if anything, the opposite. 
 
@@ -190,17 +200,22 @@ For all area plots case-based linking works as it always does, though with highl
 
 Examples of interactive graphics with weighted displays are given in Figures~\ref{webwords1} and \ref{webwords2}.  The dataset contains information on how often each day words on a website are viewed (number of page impressions), clicked on, and lead to sales.  The period covered is the first eight months of 2006.  The histogram on the left of Figures~\ref{webwords1} is of weeks weighted by numbers of page impressions.  One of the advertising keywords has been selected to give the histogram on the right.  It is clear that the decline in page impressions for this keyword is one of the reasons for the overall decline.
 
-\begin{center}
-      \includegraphics[width=12cm]{WebWords1.pdf}
-      \caption{\label{webwords1}\em Histograms of weeks weighted by page impressions.  For the plot on the right, one of the keywords has been selected from a barchart (not shown).}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{web-words}%
+  \includegraphics[width=0.5\linewidth]{web-words-brushed}
+  \caption{\em Histograms of weeks weighted by page impressions.  For the plot on the right, one of the keywords has been selected from a barchart (not shown).}
+  \label{webwords1}
+\end{figure}
 
 Figure~\ref{webwords2} shows on the left a histogram of weeks weighted by clicks.  The decline in page impressions had little or no effect on the numbers of clicks observed.  In the spinogram on the right, the keyword corresponding to the name of the company has been selected.  It can be seen that the percentage of these clicks remains constant across the period.
 
-\begin{center}
-      \includegraphics[width=12cm]{WebWords2.pdf}
-      \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram with keyword of the company's name selected.}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{web-clicks}%
+  \includegraphics[width=0.5\linewidth]{web-clicks-stacked}
+  \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram with keyword of the company's name selected.}
+\end{figure}
 
 
 \section{Weighting in multivariate graphics}
@@ -211,10 +226,11 @@ Multivariate categorical data are easier to deal with.  All forms of mosaicplots
 
 Figure~\ref{indreg} shows a related example from a financial dataset in which companies were classified by sector and by region.  The weighted plot on the right shows that foreign manufacturing companies are much more substantial in terms of assets (the rightmost column in the middle).  Other features include the relative importance of the Information sector in the MidAtlantic region (third column from the left) and the low total assets of the mining sector in the Mountain region (first column).
 
-\begin{center}
-      \includegraphics[width=12cm]{IndRegAndWtd.pdf}
-      \caption{\label{indreg}\em Fluctuation diagrams of over $80,000$ companies by sector and region.  The plot on the left shows counts of companies and the plot on the right is weighted by the total assets of the companies.}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=12cm]{IndRegAndWtd.pdf}
+  \caption{\label{indreg}\em Fluctuation diagrams of over $80,000$ companies by sector and region.  The plot on the left shows counts of companies and the plot on the right is weighted by the total assets of the companies.}
+\end{figure}
 
 \section{Weighting in specialist graphics}
 \label{spec}
@@ -225,30 +241,36 @@ Self-weighted histograms are an interesting special case of weighted graphics, w
 
 Self-weighted histograms are useful, when absolute sizes of units are to be compared rather than numbers of units.  If the distribution of turnover of different companies is plotted in a standard histogram, then each company is represented by the same column area, whether they have a huge turnover or hardly any.  A self-weighting histogram of the same data allocates an area to each company proportional to its turnover, so that the larger ones are correspondingly emphasised compared to the smaller ones.  Another application would be in displaying the distribution of the numbers of fatalities in traffic accidents.  In a self-weighting histogram, twenty accidents each with one fatality are equivalent to one accident with twenty fatalities.  In a standard histogram the more serious accidents are visually downplayed.  Figure~\ref{uvw} shows another application from a Bayesian Model Averaging study \citep{unwin:2003}.  Plotting the probabilities in an unweighted histogram does not reflect their importance.  Imagine how the unweighted and self-weighted histograms would look, if one model had an a posteriori probability of $0.65$ and the other $35$ each had one of $0.01$.  These examples are all importance weighting.
 
-\begin{center}
-      \includegraphics[width=12cm]{uvwWtdHist.pdf}
-      \caption{\label{uvw}\em A self-weighted histogram of the posterior probabilities of $36$ models from a Bayesian Model Average analysis.  Bar heights are proportional to the sums of probabilities of the models in the bin.  The horizontal scale is from 0 to 0.2 with equal class widths of 0.01.   The model fitted in a non-Bayesian analysis is highlighted.}
-      \end{center}
- 
- 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\linewidth]{post-prob}
+  \caption{\em A self-weighted histogram of the posterior probabilities of $36$ models from a bayesian model averaging analysis.  Bar heights are proportional to the sums of probabilities of the models in the bin.  The horizontal scale is from 0 to 0.2 with equal class widths of 0.01.  The model fitted in a non-Bayesian analysis is highlighted.}
+  \label{uvw}
+\end{figure} 
+
 Since weights must be additive, the histogram of percentages of blacks in Section~\ref{pop} could not have been self-weighted.  Had the actual numbers of blacks in each county been plotted, then the plot could have been self-weighted.
-   
-      When complex mosaicplots with many cells are drawn, we usually want to concentrate on the larger ones and it is helpful to know how large they are and to be able to select them.  In the software MANET \citep{unwin:1996} a histogram of cell sizes may be drawn for a mosaicplot.  The histogram is self-weighted to reflect the number of cases rather than the number of cells, cf. Figure~\ref{binmosaic}. Frequency weighting is used.
+
+When complex mosaicplots with many cells are drawn, we usually want to concentrate on the larger ones and it is helpful to know how large they are and to be able to select them.  In the software MANET \citep{unwin:1996} a histogram of cell sizes may be drawn for a mosaicplot.  The histogram is self-weighted to reflect the number of cases rather than the number of cells, cf. Figure~\ref{binmosaic}. Frequency weighting is used.
 
 
-\begin{center}
-      \includegraphics[width=12cm]{binmosaic.pdf}
-      \caption{\label{binmosaic}\em A fluctuation diagram of the eight binary variables of the Rochdale dataset \citep{whittaker:1990}.   The accompanying histogram shows the distribution of cell sizes weighted by the sizes themselves.  The four biggest cells have been selected and contain just over $25\%$ of the data.  Linking to barcharts of the variables (not shown) reveals that they are all combinations where both husband and wife work, there is no child under $4$, no one else in the household works and the family is not Asian.}
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=12cm]{binmosaic.pdf}
+  \caption{\label{binmosaic}\em A fluctuation diagram of the eight binary variables of the Rochdale dataset \citep{whittaker:1990}.   The accompanying histogram shows the distribution of cell sizes weighted by the sizes themselves.  The four biggest cells have been selected and contain just over $25\%$ of the data.  Linking to barcharts of the variables (not shown) reveals that they are all combinations where both husband and wife work, there is no child under $4$, no one else in the household works and the family is not Asian.}
+\end{figure}
 
 Finally, it's worth noting that any histogram drawn of weights should really be drawn with self-weighting.  The European Social Survey publishes histograms of the design weights for each country, but not self-weighting ones (http://ess.nsd.uib.no/).  At least they report them, not all surveys report their weight distributions in full.
 \newpage
 \subsection{Graphics in metanalysis}
 \label{meta}
 
-\piccaption{\label{hc} An unweighted histogram of the weights for $8$ groups (above) and a self-weighted histogram of the same weights (below).  Both histograms have $12$ bins of width $0.1$, starting at $0$.}
-\parpic[r]{\mbox{\includegraphics[height=7cm]{HChists.pdf}
-}}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{meta}%
+  \includegraphics[width=0.5\linewidth]{meta-weighted}
+  \caption{An unweighted histogram of the weights for $8$ groups (left) and a self-weighted histogram of the same weights (right).  Both histograms have $12$ bins of width $0.1$, starting at $0$.}
+  \label{hc} 
+\end{figure}
 
 Metanalysis uses analytic weights.  How best to combine study results, when the weights differ substantially, is an interesting question.  Long before the term metanalysis was coined, \cite{cochran:1954b} suggested adjusting weights of groups of results with low variation, and consequently high weights, upwards.  ``The method prevents an experiment which happens to have a small estimated error from dominating the result, while allowing the less precise experiments to receive lower weights.''
 
@@ -262,14 +284,16 @@ Funnel plots are used to illustrate possible publication censoring through lack 
 \label{edge}
 Weighting arises naturally in displaying geographic flows or other graph structures.  Flow sizes such as trade flows \citep{unwin:1992}) or traffic flows may be represented crudely by the width of the links.  The same may be applied to the edges of network graphs, though colour or transparency with anti-aliasing are possible alternatives \citep{wills:2006}.  Figure~\ref{traffic} shows traffic flows in the centre of Augsburg in 2001.   Like any modern city, Augsburg has encouraged traffic to avoid the city centre and this reflects the patterns observed.  North-South traffic avoids the centre altogether.
 
-\begin{center}
-      \includegraphics[width=12cm]{TraffFlow.pdf}
-      \caption{\label{traffic}\em Traffic flows in the centre of Augsburg in 2001. The flows are drawn as wedges with the base proportional to the amount of traffic. }
-      \end{center}
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=12cm]{TraffFlow.pdf}
+  \caption{\label{traffic}\em Traffic flows in the centre of Augsburg in 2001. The flows are drawn as wedges with the base proportional to the amount of traffic. }
+\end{figure}
 
 \section{Software}
 \label{sw}
-Standard statistical software packages do not tend to offer weighted options for plots.  As remarked in Section~\ref{intro}, this is not essential as some of the displays can be achieved by a restructuring of the dataset --- however, it does provide more flexibility and ease of use.  Both the interactive graphics packages Heike Hofmann's MANET \citep{hofmann:2000a} and Martin Theus's Mondrian \citep{theus:2005} offer weighting for all area plots and MANET has bubbleplots as well.  Amongst R packages, Thomas Lumley's \textit{survey} package offers weighted histograms and boxplots, and bubbleplots and hexagonal binning for weighting scatterplots.  \textit{Survey} only works with sampling weights.  Hadley Wickham's \textit{ggplot} package for R is more general and offers a range of weighted static plots and any kind of weighting can be used.
+
+Standard statistical software packages do not tend to offer weighted options for plots.  As remarked in Section~\ref{intro}, this is not essential as some of the displays can be achieved by a restructuring of the dataset --- however, it does provide more flexibility and ease of use.  Both the interactive graphics packages Heike Hofmann's MANET \citep{hofmann:2000a} and Martin Theus's Mondrian \citep{theus:2005} offer weighting for all area plots and MANET has bubbleplots as well.  Amongst R packages, Thomas Lumley's \textit{survey} \cite{survey} package offers weighted histograms and boxplots, and bubbleplots and hexagonal binning for weighting scatterplots.  \textit{Survey} only works with sampling weights.  Hadley Wickham's \textit{ggplot2} \cite{ggplot2} package for R is more general and offers a range of weighted static plots and any kind of weighting can be used.
 
 \section{Conclusions}
 \label{conc}
@@ -277,8 +301,8 @@ Weighted graphics are a valuable supplement to standard statistical graphics.  T
 
 The interpretation of a weighted graphic depends on the variable or variables displayed, on the type of weighting involved, and, for importance weighting, on which weighting variable is used.  As with all components of statistical analyses, care must be taken in interpreting the results.
 
-\bibliographystyle{dcu}
+% \bibliographystyle{dcu}
+\bibliographystyle{plainnat}
 \bibliography{Wts}
-
 
 \end{document}
