@@ -1,4 +1,4 @@
-% zip -r paper.zip *.pdf *.tex *.bib graphics
+% zip -r weight-and-see-hw.zip *.pdf *.tex *.bib graphics
 \documentclass{svmult}
 \usepackage{graphicx}
 \DeclareGraphicsExtensions{.png,.pdf}
@@ -7,6 +7,7 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage[longnamesfirst]{natbib}
+\usepackage{wrapfig}
 
 \begin{document}
 
@@ -264,13 +265,13 @@ Finally, it's worth noting that any histogram drawn of weights should really be 
 \subsection{Graphics in metanalysis}
 \label{meta}
 
-\begin{figure}[htbp]
+\begin{wrapfigure}{r}{0.5\linewidth}
   \centering
-  \includegraphics[width=0.5\linewidth]{meta}%
-  \includegraphics[width=0.5\linewidth]{meta-weighted}
+  \includegraphics[width=\linewidth]{meta}
+  \includegraphics[width=\linewidth]{meta-weighted}
   \caption{An unweighted histogram of the weights for $8$ groups (left) and a self-weighted histogram of the same weights (right).  Both histograms have $12$ bins of width $0.1$, starting at $0$.}
   \label{hc} 
-\end{figure}
+\end{wrapfigure}
 
 Metanalysis uses analytic weights.  How best to combine study results, when the weights differ substantially, is an interesting question.  Long before the term metanalysis was coined, \cite{cochran:1954b} suggested adjusting weights of groups of results with low variation, and consequently high weights, upwards.  ``The method prevents an experiment which happens to have a small estimated error from dominating the result, while allowing the less precise experiments to receive lower weights.''
 
