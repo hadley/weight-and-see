@@ -24,8 +24,8 @@ label <- function(text, y) {
 }
 
 base + geom_histogram(binwidth = 2) + 
-  scale_y_continuous("Counties") + 
-  annotate("text", 45, 300, label = "Counties", hjust = 1)
+  scale_y_continuous("No. of Counties\nUnweighted") + 
+  annotate("text", 45, 300, label = "No. of Counties", hjust = 1)
 ggsave("perc-black-count.pdf", width = 6, height = 4)
 
 base + geom_histogram(aes(weight = poptotal / 1e6), binwidth = 2) + 
@@ -96,7 +96,13 @@ ggsave("web-clicks-stacked.pdf", width = 6, height = 4)
 # self-weighted histogram
 
 models <- read.table("liver-models.txt", header=T)
-qplot(Posteriors, data=models, geom="histogram", binwidth=0.01, weight=Posteriors, xlab="Posterior probability", xlim=c(0, 0.2)) + scale_y_continuous("Posterior probability")
+
+ggplot(models, aes(Posteriors, weight = Posteriors, fill = ModelID == 6)) +
+  geom_histogram(binwidth=0.01) +
+  scale_fill_manual(values = c("grey20", "red")) +
+  opts(legend.position = "none") + 
+  xlab("Posterior probability") + xlim(0, 0.2) + 
+  scale_y_continuous("Posterior probability")
 ggsave("post-prob.pdf", width = 8, height = 3)
 
 # Figure 8 -------------------------
@@ -108,10 +114,10 @@ ggsave("post-prob.pdf", width = 8, height = 3)
 meta <- read.table("meta-analysis.txt", header=TRUE)
 qplot(w, data=meta, geom="histogram", binwidth=0.1) + xlab("Weight") + 
   scale_y_continuous("Count")
-ggsave("meta.pdf", width = 4, height = 4)
+ggsave("meta.pdf", width = 4, height = 3)
 last_plot() + aes(weight = w) + 
     scale_y_continuous("Weight")
-ggsave("meta-weighted.pdf", width = 4, height = 4)
+ggsave("meta-weighted.pdf", width = 4, height = 3)
 
 
 # Figure 9 -------------------------
