@@ -112,6 +112,7 @@ opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.
 
 library(dplyr)
 library(ggplot2)
+library(readr)
 
 source("weighted-hist.r")
 @
@@ -145,7 +146,14 @@ the barchart should look the same.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\linewidth]{berkeley}
+%  \includegraphics[width=0.8\linewidth]{berkeley}
+<<berkeley, echo=FALSE, fig.width=6, fig.height=4, out.width='.8\\linewidth'>>=
+berkeley <- as.data.frame(UCBAdmissions)
+ggplot(berkeley, aes(Dept, weight = Freq)) +
+  geom_bar() +
+  xlab("Department")
+#ggsave("graphics/berkeley.pdf", width = 6, height = 4)
+@
   \caption{\em Number of graduate applications to six departments in Berkeley.}
   \label{berk}
 \end{figure}
@@ -169,10 +177,46 @@ A thought-provoking example of the potential of weighted graphics was first give
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\linewidth]{perc-black-count}%
-  \includegraphics[width=0.5\linewidth]{perc-black-pop-black}
-  \includegraphics[width=0.5\linewidth]{perc-black-pop}%
-  \includegraphics[width=0.5\linewidth]{perc-black-pop-white}
+
+%  \includegraphics[width=0.5\linewidth]{perc-black-count}%
+%  \includegraphics[width=0.5\linewidth]{perc-black-pop-black}
+%  \includegraphics[width=0.5\linewidth]{perc-black-pop}%
+%  \includegraphics[width=0.5\linewidth]{perc-black-pop-white}
+<<midwest, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold'>>=
+midwest <- readr::read_csv("graphics/midwest.csv")
+base <- ggplot(midwest, aes(percblack)) + scale_x_continuous("Percent black")
+
+label <- function(text, y) {
+  list(
+    scale_y_continuous(text),
+    annotate("text", 40, y, label = text, hjust = 1)
+  )
+}
+
+base +
+  geom_histogram(binwidth = 2) +
+  scale_y_continuous("No. of Counties") +
+  annotate("text", 45, 300, label = "Unweighted", hjust = 1)
+#ggsave("graphics/perc-black-count.pdf", width = 6, height = 4)
+
+base +
+  geom_histogram(aes(weight = poptotal / 1e6), binwidth = 2) +
+  scale_y_continuous("Population (millions)") +
+  annotate("text", 45, 13, label = "Population", hjust = 1)
+#ggsave("graphics/perc-black-pop.pdf", width = 6, height = 4)
+
+base +
+  geom_histogram(aes(weight = popblack / 1e6), binwidth = 2) +
+  scale_y_continuous("Black population (millions)") +
+  annotate("text", 45, 1.8, label = "Black population", hjust = 1)
+#ggsave("graphics/perc-black-pop-black.pdf", width = 6, height = 4)
+
+base +
+  geom_histogram(aes(weight = popwhite / 1e6), binwidth = 2) +
+  scale_y_continuous("White population (millions)") +
+  annotate("text", 45, 13, label = "White population", hjust = 1)
+#ggsave("graphics/perc-black-pop-white.pdf", width = 6, height = 4)
+@
   \caption{\em Histograms of the percentage of blacks in each county (upper left), the blacks percentage weighted by the county population (lower left), weighted by the black population (upper right), weighted by the white population (lower right).}
   \label{blackhists}
 \end{figure}
@@ -187,8 +231,29 @@ Area plots can be extended to incorporate weighting easily (cf. Figures~\ref{ber
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[height=6cm]{florida}%
-  \includegraphics[height=6cm]{florida-weighted}
+%  \includegraphics[height=6cm]{florida}%
+%  \includegraphics[height=6cm]{florida-weighted}
+% \begin{subfigure}[t]{.45\textwidth}
+
+<<florida-1, echo=FALSE, fig.width=5.25, fig.height=4, out.width='.45\\textwidth', fig.show='hold'>>=
+florida <- readr::read_tsv("graphics/florida-election.txt")
+base <- ggplot(florida, aes(b00pc, b_change)) +
+  xlab("Percent of vote (2000)") +
+  ylab("Change in percent of vote") +
+  xlim(0.275, 0.8)
+base + geom_point() + theme(aspect.ratio=1)
+#ggsave("graphics/florida.pdf", width = 4, height = 4)
+
+base +
+  geom_point(aes(size = population / 1e6)) +
+  scale_size_area(
+    "Population\n(millions)",
+    max_size = 10,
+    breaks = c(0.5, 1, 1.5, 2)
+  ) +
+  theme(aspect.ratio=1)
+#ggsave("graphics/florida-weighted.pdf", width = 5, height = 4)
+@
   \caption{\em The scatterplot on the left shows the percentage change in Bush's vote in the Florida election districts between the Presidential elections of 2000 and 2004 plotted against his percentage share in the election of 2000.  The plot on the right shows the same data with each point represented by a bubble whose area is proportional to the population of the district.}
   \label{bubflor}
 \end{figure}
@@ -294,8 +359,40 @@ Examples of interactive graphics with weighted displays are given in Figures~\re
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\linewidth]{web-words}%
-  \includegraphics[width=0.5\linewidth]{web-words-brushed}
+%  \includegraphics[width=0.5\linewidth]{web-words}%
+%  \includegraphics[width=0.5\linewidth]{web-words-brushed}
+
+<<keywords, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold'>>=
+keywords <- read_tsv("graphics/keywords-day.txt", col_types = cols(
+  umsatz = "d",
+  cpo = "d",
+  scr = "d",
+  ka = "d"
+))
+keywords <- keywords %>% mutate(
+  colour = factor(
+    ifelse(keyword == "AnzeigenKeyword9", "red", "grey20"),
+    levels = c("red", "grey20")
+  ),
+  company = factor(
+    ifelse(keyword == "bigX", "red", "grey20"),
+    levels = c("red", "grey20")
+  )
+)
+
+ggplot(keywords, aes(day, weight = pis / 1e3)) +
+  geom_histogram(binwidth = 7) +
+  xlab(NULL) +
+  ylab("Page impressions (thousands)")
+#ggsave("graphics/web-words.pdf", width = 6, height = 4)
+
+ggplot(keywords, aes(day, weight = pis / 1e3, fill = colour)) +
+  geom_histogram(binwidth = 7) +
+  xlab(NULL) +
+  ylab("Page impressions (thousands)") +
+  scale_fill_identity()
+#ggsave("graphics/web-words-brushed.pdf", width = 6, height = 4)
+@
   \caption{\em Histograms of weeks weighted by page impressions.  For the plot on the right, one of the keywords has been selected from a barchart (not shown).}
   \label{webwords1}
 \end{figure}
@@ -304,8 +401,24 @@ Figure~\ref{webwords2} shows on the left a histogram of weeks weighted by clicks
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\linewidth]{web-clicks}%
-  \includegraphics[width=0.5\linewidth]{web-clicks-stacked}
+%  \includegraphics[width=0.5\linewidth]{web-clicks}%
+%  \includegraphics[width=0.5\linewidth]{web-clicks-stacked}
+
+<<webclicks, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold'>>=
+ggplot(keywords, aes(day, weight = clicks)) +
+  geom_histogram(binwidth = 7) +
+  xlab(NULL) +
+  ylab("Clicks")
+#ggsave("graphics/web-clicks.pdf", width = 6, height = 4)
+
+ggplot(keywords, aes(day, weight = clicks, fill = company)) +
+  geom_histogram(binwidth = 7, position = "fill") +
+  xlab(NULL) +
+  ylab("Proportion of clicks") +
+  scale_fill_identity()
+#ggsave("graphics/web-clicks-stacked.pdf", width = 6, height = 4)
+@
+
   \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram with keyword of the company's name selected.}
 \end{figure}
 
