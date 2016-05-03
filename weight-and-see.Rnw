@@ -1,5 +1,6 @@
-% zip -r weight-and-see-hw.zip *.pdf *.tex *.bib graphics
-\documentclass{svmult}
+\documentclass[12pt]{article}
+% \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+% \geometry{letterpaper}                   % ... or a4paper or a5paper or ...
 \usepackage{graphicx}
 \DeclareGraphicsExtensions{.png,.pdf}
 \graphicspath{{graphics/}}
@@ -9,21 +10,111 @@
 \usepackage[longnamesfirst]{natbib}
 \usepackage{wrapfig}
 
+
+\usepackage[font=small,skip=5pt]{caption}
+\usepackage{subcaption}
+\usepackage{afterpage}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+% \usepackage{color}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage[dvipsnames,svgnames,table]{xcolor}
+\usepackage{hyperref}
+% \usepackage{endfloat} % Figures to the end of the document
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+%---------------------------------------------------
+%                 Editing Commands
+\newcommand{\hh}[1]{{\color{magenta} #1}}
+\newcommand{\cgj}[1]{{\color{orange} #1}}
+
+%---------------------------------------------------
+%                 Placing Figures
+
+
+%---------------------------------------------------
+% Define new environment
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{algorithm}[theorem]{Algorithm}
+%---------------------------------------------------
+
+%\pdfminorversion=4
+% NOTE: To produce blinded version, replace "0" with "1" below.
+\newcommand{\blind}{0}
+
+% DON'T change margins - should be 1 inch all around.
+\addtolength{\oddsidemargin}{-.5in}%
+\addtolength{\evensidemargin}{-.5in}%
+\addtolength{\textwidth}{1in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
+
+
 \begin{document}
 
-\title*{Weight and See}
-\author{
-Antony Unwin\inst{1}, Heike Hofmann\inst{2}  \and Hadley Wickham\inst{3}
-}
-\institute{
-Augsburg University, Germany \texttt{unwin@math.uni-augsburg.de}\and Iowa State University, USA \texttt{hofmann@iastate.edu}\and Rice University, USA \texttt{h.wickham@gmail.com}
-}
+%\bibliographystyle{natbib}
 
-\maketitle
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if0\blind
+{
+  \title{\bf Weight and See}
+  \author{Antony Unwin\\
+    Department of Mathematics, Augsburg University, Germany\\
+    and \\
+    Heike Hofmann\\
+    Department of Statistics and Statistical Laboratory, Iowa State University, USA\\
+    and \\
+    Hadley Wickham \\
+    Department of Statistics, Rice University, USA \\}
+  \maketitle
+} \fi
+
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Weight and See}
+\end{center}
+  \medskip
+} \fi
+
+\bigskip
 \begin{abstract}
 Weights are important in many areas of statistics, particularly in surveys and in model-fitting algorithms.  They are not often used in graphical displays, although it is easy to incorporate weights in most standard displays, especially area ones, and they add considerable flexibility and exploratory power.  Interpretation of weighted displays is not always easy, though difficulties in interpretation apply to all graphics.   With weighted displays the main problem arises in taking proper account of what kinds of weights are being used.  This paper discusses weighting and weighted graphical displays in general.  It describes how weighted displays can be used both statically and interactively.
 \end{abstract}
+
+\noindent%
+{\it Keywords:} 7 or fewer keywords.
+\vfill
+
+\newpage
+\spacingset{1.45} % DON'T change the spacing!
+
+\tableofcontents
+\newpage
+
+
+
+<<setup, echo = FALSE, message = FALSE, warning = FALSE>>=
+options(replace.assign=TRUE,width=70, digits=2)
+require(knitr)
+opts_chunk$set(fig.path='figure/', cache.path='cache/', fig.align='center', fig.width=5, fig.height=5, par=TRUE, cache=TRUE, concordance=TRUE, autodep=TRUE, message=F, warning=F)
+
+library(dplyr)
+library(ggplot2)
+
+source("weighted-hist.r")
+@
 
 \section{Introduction}
 \label{intro}
@@ -101,8 +192,8 @@ Area plots can be extended to incorporate weighting easily (cf. Figures~\ref{ber
   \caption{\em The scatterplot on the left shows the percentage change in Bush's vote in the Florida election districts between the Presidential elections of 2000 and 2004 plotted against his percentage share in the election of 2000.  The plot on the right shows the same data with each point represented by a bubble whose area is proportional to the population of the district.}
   \label{bubflor}
 \end{figure}
-      
-As always with graphics, rules are not hard and fast.  Some bubbleplots can be very informative.  The scatterplot on the left of Figure~\ref{bubflor} suggests that Bush's vote in 2004 increased more the bigger his vote share in the election of 2000.  The scatterplot on the right suggests, if anything, the opposite. 
+
+As always with graphics, rules are not hard and fast.  Some bubbleplots can be very informative.  The scatterplot on the left of Figure~\ref{bubflor} suggests that Bush's vote in 2004 increased more the bigger his vote share in the election of 2000.  The scatterplot on the right suggests, if anything, the opposite.
 
 Many statistics are plotted without weights, when the weights would contribute useful background information.  Unemployment rates and morbidity rates are often discussed by region or by population group.  Knowing the relative sizes of the regions and groups would assist in making fair comparisons.
 
@@ -148,7 +239,7 @@ Importance weighting (IW) is used when cases are judged to have different import
 
 Shopping panel data includes information on whether someone bought a product and how much they bought of it.  The quantity bought by someone is an importance weight and not a frequency weight.  One person buying two units of a product is statistically different from two people independently buying one unit each.
 
-Returning to the hypothetical example, consider a dataset of illness rates $r_j$ by subpopulation, i.e. $\left\{r_j=\frac{\sum_{i=1}^{n_j}Z_{ij}}{n_j}\right\}$, which has importance weights 
+Returning to the hypothetical example, consider a dataset of illness rates $r_j$ by subpopulation, i.e. $\left\{r_j=\frac{\sum_{i=1}^{n_j}Z_{ij}}{n_j}\right\}$, which has importance weights
 $$w^{IW}(r_j)=N_j$$
 In this case it is interesting to note that
 $$\sum_{i=1}^{n_j}w_{ij}^{PW} \propto  w^{IW}(r_j)$$
@@ -164,14 +255,14 @@ $$w_i^{IW}\propto N_i$$
 \subsection{Analytic weighting}
 \label{aw}
 Analytic weighting (AW) is necessary when results from different samples are combined and plays a critical role in metanalysis.  The samples may be measured with different precision and so weights equal to the inverse of the variance are used.  This means that observations measured with higher precision get more weight.
-Consider again the dataset of illness rates 
+Consider again the dataset of illness rates
 $$\left\{r_j=\frac{\sum_{i=1}^{n_j}Z_{ij}}{n_j}\quad \text{ for }j=1,\dots,M\right\}.$$
 \noindent Analytic weights are almost always based on an underlying model. The model, here assumes binomially distributed random variables $Z_{.j} \sim B_{n_j, p_j}$, which induce analytic weights for the rates $r_j$ that are inversely proportional to their variance:
 \[
 w_j^{AW}(r_j) \propto \frac{n_j}{r_j(1-r_j)}.
 \]
 We have assumed $N_j>>n_j$ so that there is no need to correct for finite sampling.
- 
+
 If the measurement variances are equal, but there are more observations in one sample than in another, then analytic weighting is equivalent to frequency weighting (weighting by the number of observations), when you are estimating a mean or proportion.  For example, assuming $r_j\approx r$ for all $j$ leads to
 $$w_j^{AW} \propto n_j=w_j^{FW}$$
 In general the statistic from the $j$th group has weight
@@ -247,7 +338,7 @@ Self-weighted histograms are useful, when absolute sizes of units are to be comp
   \includegraphics[width=\linewidth]{post-prob}
   \caption{\em A self-weighted histogram of the posterior probabilities of $36$ models from a bayesian model averaging analysis.  Bar heights are proportional to the sums of probabilities of the models in the bin.  The horizontal scale is from 0 to 0.2 with equal class widths of 0.01.  The model fitted in a non-Bayesian analysis is highlighted.}
   \label{uvw}
-\end{figure} 
+\end{figure}
 
 Since weights must be additive, the histogram of percentages of blacks in Section~\ref{pop} could not have been self-weighted.  Had the actual numbers of blacks in each county been plotted, then the plot could have been self-weighted.
 
@@ -270,7 +361,7 @@ Finally, it's worth noting that any histogram drawn of weights should really be 
   \includegraphics[width=\linewidth]{meta}
   \includegraphics[width=\linewidth]{meta-weighted}
   \caption{An unweighted histogram of the weights for $8$ groups (above) and a self-weighted histogram of the same weights (below).  Both histograms have $12$ bins of width $0.1$, starting at $0$.}
-  \label{hc} 
+  \label{hc}
 \end{wrapfigure}
 
 Metanalysis uses analytic weights.  How best to combine study results, when the weights differ substantially, is an interesting question.  Long before the term metanalysis was coined, \cite{cochran:1954b} suggested adjusting weights of groups of results with low variation, and consequently high weights, upwards.  ``The method prevents an experiment which happens to have a small estimated error from dominating the result, while allowing the less precise experiments to receive lower weights.''
