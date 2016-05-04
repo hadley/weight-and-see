@@ -371,24 +371,28 @@ keywords <- read_tsv("graphics/keywords-day.txt", col_types = cols(
 ))
 keywords <- keywords %>% mutate(
   colour = factor(
-    ifelse(keyword == "AnzeigenKeyword9", "red", "grey20"),
-    levels = c("red", "grey20")
+    ifelse(keyword == "AnzeigenKeyword9", "red", "grey50"),
+    levels = c("red", "grey50")
   ),
   company = factor(
-    ifelse(keyword == "bigX", "red", "grey20"),
-    levels = c("red", "grey20")
+    ifelse(keyword == "bigX", "red", "grey50"),
+    levels = c("red", "grey50")
   )
 )
 
-ggplot(keywords, aes(day, weight = pis / 1e3)) +
-  geom_histogram(binwidth = 7) +
-  xlab(NULL) +
+keywords$week <- lubridate::week(keywords$day)
+
+ggplot(keywords, aes(week, weight = pis / 1e3)) +
+  geom_histogram(binwidth = 1, fill="grey50") +
+  scale_x_continuous("", breaks=c(1,14,27),
+                     labels=c("Jan", "Apr", "Jul")) +
   ylab("Page impressions (thousands)")
 #ggsave("graphics/web-words.pdf", width = 6, height = 4)
 
-ggplot(keywords, aes(day, weight = pis / 1e3, fill = colour)) +
-  geom_histogram(binwidth = 7) +
-  xlab(NULL) +
+ggplot(keywords, aes(week, weight = pis / 1e3, fill = colour)) +
+  geom_histogram(binwidth = 1) +
+  scale_x_continuous("", breaks=c(1,14,27),
+                     labels=c("Jan", "Apr", "Jul")) +
   ylab("Page impressions (thousands)") +
   scale_fill_identity()
 #ggsave("graphics/web-words-brushed.pdf", width = 6, height = 4)
@@ -404,12 +408,21 @@ Figure~\ref{webwords2} shows on the left a histogram of weeks weighted by clicks
 %  \includegraphics[width=0.5\linewidth]{web-clicks}%
 %  \includegraphics[width=0.5\linewidth]{web-clicks-stacked}
 
-<<webclicks, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold'>>=
-ggplot(keywords, aes(day, weight = clicks)) +
-  geom_histogram(binwidth = 7) +
-  xlab(NULL) +
-  ylab("Clicks")
+<<webclicks, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold', warning=FALSE, message=FALSE>>=
 #ggsave("graphics/web-clicks.pdf", width = 6, height = 4)
+
+ggplot(keywords, aes(week, weight = clicks)) +
+  geom_histogram(binwidth = 1, fill="grey50") +
+  scale_x_continuous("", breaks=c(1,14,27),
+                     labels=c("Jan", "Apr", "Jul")) +
+  ylab("Clicks")
+
+require(productplots)
+prodplot(clicks~company+week, data=keywords) + aes(fill=company) +
+  scale_fill_identity() +
+  ylab("Proportion of clicks") +
+  scale_x_continuous("", breaks=c(0,13,26)/35, labels=c("Jan", "Apr", "Jul"))
+
 
 ggplot(keywords, aes(day, weight = clicks, fill = company)) +
   geom_histogram(binwidth = 7, position = "fill") +
@@ -419,7 +432,7 @@ ggplot(keywords, aes(day, weight = clicks, fill = company)) +
 #ggsave("graphics/web-clicks-stacked.pdf", width = 6, height = 4)
 @
 
-  \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram with keyword of the company's name selected.}
+  \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram \hh{XXX not quite a spinogram yet - widths need to be adjusted - but it will make not much difference here. Is there a way to remove the spaces between the rectangles? XXX} with keyword of the company's name selected.}
 \end{figure}
 
 

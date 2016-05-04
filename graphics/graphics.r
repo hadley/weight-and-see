@@ -114,6 +114,7 @@ ggplot(keywords, aes(day, weight = clicks, fill = company)) +
   xlab(NULL) +
   ylab("Proportion of clicks") +
   scale_fill_identity()
+
 ggsave("graphics/web-clicks-stacked.pdf", width = 6, height = 4)
 
 # Figure 6 -------------------------
