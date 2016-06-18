@@ -411,28 +411,41 @@ Figure~\ref{webwords2} shows on the left a histogram of weeks weighted by clicks
 <<webclicks, echo=FALSE, fig.width=6, fig.height=4, out.width='.49\\linewidth', fig.show='hold', warning=FALSE, message=FALSE>>=
 #ggsave("graphics/web-clicks.pdf", width = 6, height = 4)
 
-ggplot(keywords, aes(week, weight = clicks)) +
-  geom_histogram(binwidth = 1, fill="grey50") +
+ggplot(keywords, aes(week, weight = clicks, fill=company)) +
+  geom_histogram(binwidth = 1, alpha=0.9) + #, fill="grey50") +
   scale_x_continuous("", breaks=c(1,14,27),
                      labels=c("Jan", "Apr", "Jul")) +
-  ylab("Clicks")
+  ylab("Clicks") +
+  scale_fill_manual(values=c("red", "grey50"))
 
-require(productplots)
-prodplot(clicks~company+week, data=keywords) + aes(fill=company) +
-  scale_fill_identity() +
+# require(productplots)
+# prodplot(clicks~company+week, data=keywords) + aes(fill=company) +
+#   scale_fill_identity() +
+#   ylab("Proportion of clicks") +
+#   scale_x_continuous("", breaks=c(0,13,26)/35, labels=c("Jan", "Apr", "Jul"))
+
+require(ggmosaic) # install from haleyjeppson/ggmosaic
+
+gg <- ggplot(data=keywords) +
+  geom_mosaic(aes(weight=clicks, x = product(week), fill=company), offset = 0) +
+  scale_fill_manual(values = c("red", "grey50")) +
   ylab("Proportion of clicks") +
-  scale_x_continuous("", breaks=c(0,13,26)/35, labels=c("Jan", "Apr", "Jul"))
+  theme(legend.position="none")
+# ggb <- ggplot_build(gg) # breaks in : ggb$panel$ranges[[1]]$x.major
+# get the labels into the right places:
+
+gg +  scale_x_product("", labels=c("Jan", rep("",11), "Apr", rep("",11), "Jul", rep("",10)))
 
 
-ggplot(keywords, aes(day, weight = clicks, fill = company)) +
-  geom_histogram(binwidth = 7, position = "fill") +
-  xlab(NULL) +
-  ylab("Proportion of clicks") +
-  scale_fill_identity()
+# ggplot(keywords, aes(day, weight = clicks, fill = company)) +
+#   geom_histogram(binwidth = 7, position = "fill") +
+#   xlab(NULL) +
+#   ylab("Proportion of clicks") +
+#   scale_fill_identity()
 #ggsave("graphics/web-clicks-stacked.pdf", width = 6, height = 4)
 @
 
-  \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram \hh{XXX not quite a spinogram yet - widths need to be adjusted - but it will make not much difference here. Is there a way to remove the spaces between the rectangles? XXX} with keyword of the company's name selected.}
+  \caption{\label{webwords2}\em On the left is a histogram of weeks weighted by clicks and on the right the corresponding spinogram with keyword of the company's name selected.}
 \end{figure}
 
 
